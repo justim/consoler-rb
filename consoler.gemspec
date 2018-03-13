@@ -20,6 +20,8 @@ Gem::Specification.new do |spec|
   # build docs on install
   spec.metadata['yard.run'] = 'yri'
 
+  spec.add_development_dependency 'rake', '~> 12.3.0'
+  spec.add_development_dependency 'minitest', '~> 5.11.3'
   spec.add_development_dependency 'yard', '~> 0.9.12'
   spec.add_development_dependency 'simplecov', '~> 0.15.1'
 end
