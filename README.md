@@ -1,4 +1,4 @@
-# Consoler
+# Consoler [![Build Status](https://api.travis-ci.org/justim/consoler-rb.svg?branch=master)](http://travis-ci.org/justim/consoler-rb)
 
 > Sinatra-like application builder for the console
 
