@@ -77,7 +77,7 @@ module Consoler
     def run(args = ARGV, disable_usage_message = false)
       # TODO signal handling of some kind?
 
-      result, matched = _run(args)
+      result, matched = _run(args.dup)
 
       if not matched and not disable_usage_message
         usage

@@ -82,4 +82,17 @@ Usage:
 
     assert_equal 'Invalid subapp/block', err.message
   end
+
+  def test_no_side_effects
+    app = Consoler::Application.new
+    app.build do
+      true
+    end
+
+    args = ['build']
+    result = app.run args
+
+    assert_equal true, result
+    assert_equal ['build'], args
+  end
 end
