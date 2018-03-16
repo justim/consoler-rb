@@ -27,10 +27,13 @@ module Consoler
     def self.create(option_def, tracker)
       option = Option.new option_def, tracker
 
+      # split short options with more than 1 char in multiple options
       if option.is_short and option.name.size > 1 then
+        # remember state
         old_tracking = tracker.is_tracking
         old_is_value = option.is_value
 
+        # if the complete option is optional, fake the tracker
         if option.is_optional then
           tracker.is_tracking = true
         end
@@ -40,6 +43,7 @@ module Consoler
         names.each_with_index do |name, i|
           new_name = "-#{name}"
 
+          # if the short option should have a value, this only counts for the last option
           if old_is_value and i == names.count - 1 then
             new_name = "#{new_name}="
           end
@@ -47,6 +51,7 @@ module Consoler
           yield Option.new new_name, tracker
         end
 
+        # reset to saved state
         tracker.is_tracking = old_tracking
       else
         yield option
@@ -92,7 +97,12 @@ module Consoler
     #
     # @param [String] option_def Definition of the option
     # @param [Consoler::Tracker] tracker tracker
+    # @raise [RuntimeError] if the option name is empty
+    # @raise [RuntimeError] if the option is long _and_ short
     def initialize(option_def, tracker)
+      # Check for multiple attributes in the option definition till we got the
+      # final name and all of its attributes
+
       option, @is_optional = _is_optional option_def, tracker
       option, @is_long = _is_long option
       option, @is_short = _is_short option
@@ -112,9 +122,22 @@ module Consoler
 
     private
 
+    # Check optional definition
+    #
+    # Does it open an optional group
+    # Does it close an optional group (can be both)
+    # Updates the tracker
+    # Removes leading [ and trailing ]
+    #
+    # @param [String] option Option definition
+    # @param [Consoler::Tracker] tracker Optional tracker
+    # @raise [RuntimeError] if you try to nest optional groups
+    # @raise [RuntimeError] if you try to close an unopened optional
+    # @return [[String, Integer|nil]] Remaining option definition, and, optional group if available
     def _is_optional(option, tracker)
       if option[0] == '[' then
         if !tracker.is_tracking then
+          # mark tracker as tracking
           tracker.is_tracking = true
           tracker.index += 1
           option = option[1..-1]
@@ -123,6 +146,7 @@ module Consoler
         end
       end
 
+      # get optional group index from tracking, if tracking
       optional = if tracker.is_tracking then
                    tracker.index
                  else
@@ -131,6 +155,7 @@ module Consoler
 
       if option[-1] == ']' then
         if tracker.is_tracking then
+          # mark tracker as non-tracking
           tracker.is_tracking = false
           option = option[0..-2]
         else
@@ -141,6 +166,10 @@ module Consoler
       return option, optional
     end
 
+    # Check long definition
+    #
+    # @param [String] option Option definition
+    # @return [[String, Boolean]]
     def _is_long(option)
       if option[0..1] == '--' then
         long = true
@@ -152,6 +181,10 @@ module Consoler
       return option, long
     end
 
+    # Check short definition
+    #
+    # @param [String] option Option definition
+    # @return [[String, Boolean]]
     def _is_short(option)
       if option[0] == '-' then
         short = true
@@ -163,6 +196,11 @@ module Consoler
       return option, short
     end
 
+    # Check value definition
+    #
+    # @param [String] option Option definition
+    # @raise [RuntimeError] if you try to assign a value to an argument
+    # @return [[String, Boolean]]
     def _value(option, argument)
       if option[-1] == '=' then
         if argument then

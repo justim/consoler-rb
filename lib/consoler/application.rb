@@ -98,12 +98,18 @@ module Consoler
 
     protected
 
+    # Run the app
+    #
+    # @param [Array<String>] args Arguments
+    # @return [[mixed, Boolean]] Result of the command, and, did the args match a command at all
     def _run(args)
       arg = args.shift
       arguments = Consoler::Arguments.new args
 
       @commands.each do |command|
         if command.command == arg then
+          # the matched command contains a subapp, run subapp with the same
+          # arguments (excluding the arg that matched this command)
           if command.action.instance_of? Consoler::Application then
             result, matched = command.action._run(args)
 
@@ -123,8 +129,13 @@ module Consoler
       return nil, false
     end
 
+    # Print the usage message for this command
+    #
+    # @param [String] prefix A prefix for the command from a parent app
+    # @return [Consoler::Application]
     def _commands_usage(prefix='')
       @commands.each do |command|
+        # print the usage message of a subapp with a prefix from the current command
         if command.action.instance_of? Consoler::Application then
           command.action._commands_usage "#{prefix} #{command.command}"
         else
@@ -141,19 +152,34 @@ module Consoler
           print "\n"
         end
       end
+
+      self
     end
 
     private
 
+    # Add a command
+    #
+    # @param [String] command Command name
+    # @param [String] options_def Definition of options
+    # @param [Proc, Consoler::Application] action Action or subapp
+    # @return [Consoler::Application]
     def _add_command(command, options_def, action)
       @commands.push(Consoler::Command.new(
         command: command,
         options: Consoler::Options.new(options_def),
         action: action,
       ))
+
+      self
     end
 
+    # Execute an action with argument match info
+    #
+    # @param [Proc] action Action
+    # @param [Hash] match Argument match information
     def _dispatch(action, match)
+      # match parameter names to indices of match information
       arguments = action.parameters.map do |parameter|
         match[parameter[1].to_s]
       end

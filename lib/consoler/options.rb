@@ -13,12 +13,14 @@ module Consoler
     # Create a list of option based on a string definition
     #
     # @param options_def [String] A string definition of the desired options
+    # @raise [RuntimeError] if you try to use a duplicate name
     def initialize(options_def)
       @options = []
       @description = nil
 
       return if options_def.nil?
 
+      # strip the description
       if match = /(^|\s+)-- (?<description>.*)$/.match(options_def) then
         @description = match[:description]
         options_def = options_def[0...-match[0].size]
@@ -44,7 +46,7 @@ module Consoler
     # @param name [String] Name of the option
     # @return [Consoler::Option, nil]
     def get(name)
-      each do |option|
+      each do |option, _|
         if option.name == name then
           return option
         end
@@ -72,6 +74,9 @@ module Consoler
       @options.size
     end
 
+    # Get the definition for these options
+    #
+    # @return [String] Options definition
     def to_definition
       definition = ''
       optional = nil
@@ -87,6 +92,7 @@ module Consoler
         definition += option.to_definition
 
         if option.is_optional then
+          # only close when the next option is not optional, or another optional group
           if @options[i + 1].nil? or optional != @options[i + 1].is_optional then
             definition += ']'
             optional = nil

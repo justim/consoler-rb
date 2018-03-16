@@ -142,6 +142,13 @@ class ArgumentsTest < Minitest::Test
     assert_equal 3, match['v']
   end
 
+  def test_multi_short_mixed
+    match = run_match ['-vvf', '-v'], '-vf'
+
+    assert_equal 3, match['v']
+    assert_equal 1, match['f']
+  end
+
   def test_dashed_long_option
     match = run_match ['--dashed-option'], '--dashed-option'
 
