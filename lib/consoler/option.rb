@@ -133,7 +133,7 @@ module Consoler
     # @param [Consoler::Tracker] tracker Optional tracker
     # @raise [RuntimeError] if you try to nest optional groups
     # @raise [RuntimeError] if you try to close an unopened optional
-    # @return [[String, Integer|nil]] Remaining option definition, and, optional group if available
+    # @return [(String, Integer|nil)] Remaining option definition, and, optional group if available
     def _is_optional(option, tracker)
       if option[0] == '[' then
         if !tracker.is_tracking then
@@ -169,7 +169,7 @@ module Consoler
     # Check long definition
     #
     # @param [String] option Option definition
-    # @return [[String, Boolean]]
+    # @return [(String, Boolean)]
     def _is_long(option)
       if option[0..1] == '--' then
         long = true
@@ -184,7 +184,7 @@ module Consoler
     # Check short definition
     #
     # @param [String] option Option definition
-    # @return [[String, Boolean]]
+    # @return [(String, Boolean)]
     def _is_short(option)
       if option[0] == '-' then
         short = true
@@ -200,7 +200,7 @@ module Consoler
     #
     # @param [String] option Option definition
     # @raise [RuntimeError] if you try to assign a value to an argument
-    # @return [[String, Boolean]]
+    # @return [(String, Boolean)]
     def _value(option, argument)
       if option[-1] == '=' then
         if argument then

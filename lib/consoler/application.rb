@@ -101,7 +101,7 @@ module Consoler
     # Run the app
     #
     # @param [Array<String>] args Arguments
-    # @return [[mixed, Boolean]] Result of the command, and, did the args match a command at all
+    # @return [(mixed, Boolean)] Result of the command, and, did the args match a command at all
     def _run(args)
       arg = args.shift
       arguments = Consoler::Arguments.new args
