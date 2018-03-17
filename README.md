@@ -155,6 +155,30 @@ Optional-tokens can occur anywhere in the options, as long as they are not neste
 
 Options and/or arguments are mandatory unless specified otherwise.
 
+Grouping of optionals allows you do things like this:
+
+```ruby
+app = Consoler::Application.new
+app.shout '[first_name last_name] [name]' do |first_name, last_name, name|
+  # by definition, `last_name` is also filled
+  unless first_name.nil? then
+    puts "Hello #{first_name} #{last_name}!"
+  end
+
+  unless name.nil? then
+    puts "Hello #{name}!"
+  end
+end
+
+# calling with two arguments can fill the first group
+# prints "Hello John Doe!"
+app.run(['shout', 'John', 'Doe'])
+
+# calling with one argument it is not possible to fill the first group
+# prints "Hello Mr. White!"
+app.run(['shout', 'Mr. White!'])
+```
+
 #### Return types in action block
 
 | Option type | Return type (ex.)       | Default (if optional) |
