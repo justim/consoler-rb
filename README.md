@@ -51,14 +51,14 @@ gem install consoler
 or add to your `Gemfile` for applications
 
 ```ruby
-gem 'consoler', '~> 1.0.2'
+gem 'consoler', '~> 1.0.3'
 ```
 
 or to your `.gemspec` file for gems
 
 ```ruby
 Gem::Specification.new do |spec|
-  spec.add_dependency 'consoler', '~> 1.0.2'
+  spec.add_dependency 'consoler', '~> 1.0.3'
 end
 ```
 
