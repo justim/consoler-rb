@@ -252,7 +252,7 @@ Make the file executable with `chmod a+x app.rb`, you can now call it with `./ap
 
 ### Current wish-list
 
-- Normalization of option names `--no-interaction` => `no_interaction`
+- Aliases, mostly to "document" short options, `-v|--verbose`
 
 ## Final notes
 

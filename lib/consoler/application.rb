@@ -181,10 +181,38 @@ module Consoler
     def _dispatch(action, match)
       # match parameter names to indices of match information
       arguments = action.parameters.map do |parameter|
-        match[parameter[1].to_s]
+        parameter_name = parameter[1].to_s
+
+        if match.has_key? parameter_name then
+          match[parameter_name]
+        else
+          # check for the normalized name of every match to see
+          # if it fits the parameter name
+          match.each do |name, value|
+            normalized_name = _normalize name
+
+            if parameter_name == normalized_name then
+              return value
+            end
+          end
+        end
       end
 
       action.call(*arguments)
+    end
+
+    # Normalize a name to be used as a variable name
+    #
+    # @param [String] name Name
+    # @return [String] Normalized name
+    def _normalize(name)
+      # maybe do something more, maybe not.. ruby does allow for
+      # some weird stuff to be used as a variable name. the user
+      # should use some common sense. and, other things might
+      # also be an syntax error, like starting with a number.
+      # this normalization is more of a comvenience than anything
+      # else
+      name.gsub('-', '_')
     end
   end
 end

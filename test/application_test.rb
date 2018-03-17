@@ -95,4 +95,15 @@ Usage:
     assert_equal true, result
     assert_equal ['build'], args
   end
+
+  def test_dashed_option
+    app = Consoler::Application.new
+    app.build '--use-fall' do |use_fall|
+      use_fall
+    end
+
+    result = app.run ['build', '--use-fall']
+
+    assert_equal true, result
+  end
 end
