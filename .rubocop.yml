@@ -1,0 +1,45 @@
+AllCops:
+  TargetRubyVersion: 2.5
+
+  Exclude:
+    - 'test/**/*'
+
+# 80 is not enough these days
+Metrics/LineLength:
+  Max: 100
+
+# Not ready for 100 yet
+Metrics/ClassLength:
+  Max: 250
+
+# Not ready for 20 yet
+Metrics/MethodLength:
+  Max: 100
+
+Metrics/AbcSize:
+  Enabled: false
+
+# not ready for 10 just yet
+Metrics/CyclomaticComplexity:
+  Max: 30
+
+Metrics/BlockNesting:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+# I prefer regular if statements in some cases
+Style/IfUnlessModifier:
+  Enabled: false
+Style/GuardClause:
+  Enabled: false
+
+# `super` makes no sense in this case
+# `#respond_to_missing?` is implemented
+Style/MethodMissingSuper:
+  Enabled: false
+
+# I like the comma
+Style/TrailingCommaInArguments:
+  Enabled: false

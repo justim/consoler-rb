@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 module Consoler
-
   # Argument/Options matcher
   #
   # Given a list of arguments and a list option try to match them
   class Matcher
-
     # Create a matcher
     #
     # @param [Consoler::Arguments] arguments List of arguments
@@ -27,14 +25,14 @@ module Consoler
       parse_options = true
 
       _loop_args do |arg|
-        unless parse_options then
+        unless parse_options
           @argument_values.push arg
           next
         end
 
         # when "argument" is --, then stop parsing the rest of the arguments
         # and treat the rest as regular arguments
-        if arg == '--' then
+        if arg == '--'
           parse_options = false
           next
         end
@@ -49,12 +47,12 @@ module Consoler
       remaining = _match_arguments
       _fill_defaults
 
-      if @matched_options.size == @options.size then
+      if @matched_options.size == @options.size
         @matched_options['remaining'] = remaining
         return @matched_options
       end
 
-      return nil
+      nil
     end
 
     private
@@ -68,23 +66,23 @@ module Consoler
       is_short = false
       name = nil
 
-      if arg[0..1] == '--' then
+      if arg[0..1] == '--'
         is_long = true
         name = arg[2..-1]
-      elsif arg[0] == '-' then
+      elsif arg[0] == '-'
         is_short = true
         name = arg[1..-1]
       end
 
       # arg is not a long/short option, add to arguments values
-      unless is_long or is_short then
+      unless is_long || is_short
         @argument_values.push arg
         return true
       end
 
-      unless name.nil? then
+      unless name.nil?
         # get the name of the option, short options use the first character
-        option_name = if is_short then
+        option_name = if is_short
                         name[0]
                       else
                         name
@@ -99,16 +97,17 @@ module Consoler
         needs_long = option.is_long
 
         # see if the type if right, short or long
-        if needs_long and not is_long then
+        if needs_long && !is_long
           return nil
-        elsif needs_short and not is_short then
+        elsif needs_short && !is_short
           return nil
         end
 
-        if is_long then
-          if option.is_value then
+        if is_long
+          if option.is_value
             # is_value needs a next argument for its value
             return nil if _peek_next.nil?
+
             @matched_options[name] = _peek_next
             _skip_next
           else
@@ -116,10 +115,11 @@ module Consoler
           end
         end
 
-        if is_short then
-          if name.size == 1 and option.is_value then
+        if is_short
+          if name.size == 1 && option.is_value
             # is_value needs a next argument for its value
             return nil if _peek_next.nil?
+
             @matched_options[name] = _peek_next
             _skip_next
           else
@@ -128,7 +128,7 @@ module Consoler
               short_option = @options.get n
               return nil if short_option.nil?
 
-              if @matched_options[n].nil? then
+              if @matched_options[n].nil?
                 @matched_options[n] = 0
               end
 
@@ -138,7 +138,7 @@ module Consoler
         end
       end
 
-      return true
+      true
     end
 
     # Loop through the arguments
@@ -151,7 +151,7 @@ module Consoler
 
       # use an incrementing index, to be able to peek to the next in the list
       # and to skip an item
-      while @index < size do
+      while @index < size
         yield @arguments.args[@index]
 
         _skip_next
@@ -197,7 +197,7 @@ module Consoler
         # arguments supplied (info available from optionals map)
         optionals.each do |_, optional|
           optional.each do |before|
-            if before[:included] then
+            if before[:included]
               @matched_options[before[:name]] = @argument_values[argument_values_index]
               argument_values_index += 1
             end
@@ -205,7 +205,7 @@ module Consoler
         end
 
         # only fill mandatory argument if its not the :REMAINING key
-        if mandatory_arg_name != :REMAINING then
+        if mandatory_arg_name != :REMAINING
           @matched_options[mandatory_arg_name] = @argument_values[argument_values_index]
           argument_values_index += 1
         end
@@ -214,7 +214,7 @@ module Consoler
       remaining = []
 
       # left over arguments
-      while argument_values_index < @argument_values.size do
+      while argument_values_index < @argument_values.size
         remaining.push @argument_values[argument_values_index]
         argument_values_index += 1
       end
@@ -229,18 +229,18 @@ module Consoler
       @optionals_before = {}
       tracker = {}
 
-      @options.each do |option, key|
+      @options.each do |option, _key|
         next unless option.is_argument
 
-        if option.is_optional then
+        if option.is_optional
           # setup tracker for optional group
           tracker[option.is_optional] = [] if tracker[option.is_optional].nil?
 
           # mark all optionals as not-included
-          tracker[option.is_optional].push({
+          tracker[option.is_optional].push(
             included: false,
             name: option.name,
-          })
+          )
         else
           @optionals_before[option.name] = tracker
           tracker = {}
@@ -248,7 +248,7 @@ module Consoler
       end
 
       # make sure all optionals are accounted for in the map
-      if tracker != {} then
+      if tracker != {}
         # use a special key so we can handle it differently in the filling process
         @optionals_before[:REMAINING] = tracker
         @optionals_before_has_remaining = true
@@ -267,7 +267,7 @@ module Consoler
       mandatories_matched = @optionals_before.size
 
       # there are optionals at the end of the options, don't match the void
-      if @optionals_before_has_remaining then
+      if @optionals_before_has_remaining
         mandatories_matched -= 1
       end
 
@@ -276,11 +276,11 @@ module Consoler
       # loop through optional map
       _each_optional_before_sorted do |before|
         # are there enough arguments left to fill this optional group
-        if (total + before.size + mandatories_matched) <= @argument_values.size then
+        if (total + before.size + mandatories_matched) <= @argument_values.size
           total += before.size
 
           before.each do |val|
-            val[:included] = true;
+            val[:included] = true
           end
         end
       end
@@ -293,10 +293,10 @@ module Consoler
     # @return [Consoler::Matcher]
     def _fill_defaults
       @options.each do |option|
-        if option.is_optional then
-          unless @matched_options.has_key? option.name then
-            @matched_options[option.name] = option.default_value
-          end
+        next unless option.is_optional
+
+        unless @matched_options.key? option.name
+          @matched_options[option.name] = option.default_value
         end
       end
 
@@ -312,10 +312,10 @@ module Consoler
       @optionals_before.each do |_, optionals|
         tmp = []
         optionals.each do |optional_index, before|
-          tmp.push({
+          tmp.push(
             count: before.size,
             index: optional_index,
-          })
+          )
         end
 
         tmp.sort! { |a, b| b[:count] - a[:count] }.each do |item|

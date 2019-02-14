@@ -3,7 +3,6 @@
 require_relative 'matcher'
 
 module Consoler
-
   # Arguments
   #
   # @attr_reader [Array<String>] args Raw arguments

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Consoler
-
   # Represents an option
   #
   # @attr_reader [String] name Name of the options
@@ -28,13 +27,13 @@ module Consoler
       option = Option.new option_def, tracker
 
       # split short options with more than 1 char in multiple options
-      if option.is_short and option.name.size > 1 then
+      if option.is_short && option.name.size > 1
         # remember state
         old_tracking = tracker.is_tracking
         old_is_value = option.is_value
 
         # if the complete option is optional, fake the tracker
-        if option.is_optional then
+        if option.is_optional
           tracker.is_tracking = true
         end
 
@@ -44,7 +43,7 @@ module Consoler
           new_name = "-#{name}"
 
           # if the short option should have a value, this only counts for the last option
-          if old_is_value and i == names.count - 1 then
+          if old_is_value && i == names.count - 1
             new_name = "#{new_name}="
           end
 
@@ -67,13 +66,13 @@ module Consoler
     def to_definition
       definition = name
 
-      if is_long then
+      if is_long
         definition = "--#{definition}"
-      elsif is_short then
+      elsif is_short
         definition = "-#{definition}"
       end
 
-      if is_value then
+      if is_value
         definition = "#{definition}="
       end
 
@@ -88,7 +87,7 @@ module Consoler
       return 0 if is_short
       return false if is_long
 
-      return nil
+      nil
     end
 
     protected
@@ -106,16 +105,16 @@ module Consoler
       option, @is_optional = _is_optional option_def, tracker
       option, @is_long = _is_long option
       option, @is_short = _is_short option
-      @is_argument = (not @is_long and not @is_short)
+      @is_argument = (!@is_long && !@is_short)
       option, @is_value = _value option, @is_argument
 
       @name = option
 
-      if @name.empty? then
+      if @name.empty?
         raise 'Option must have a name'
       end
 
-      if @is_long and @is_short
+      if @is_long && @is_short
         raise 'Option can not be a long and a short option'
       end
     end
@@ -135,8 +134,8 @@ module Consoler
     # @raise [RuntimeError] if you try to close an unopened optional
     # @return [(String, Integer|nil)] Remaining option definition, and, optional group if available
     def _is_optional(option, tracker)
-      if option[0] == '[' then
-        if !tracker.is_tracking then
+      if option[0] == '['
+        if !tracker.is_tracking
           # mark tracker as tracking
           tracker.is_tracking = true
           tracker.index += 1
@@ -147,14 +146,12 @@ module Consoler
       end
 
       # get optional group index from tracking, if tracking
-      optional = if tracker.is_tracking then
+      optional = if tracker.is_tracking
                    tracker.index
-                 else
-                   nil
                  end
 
-      if option[-1] == ']' then
-        if tracker.is_tracking then
+      if option[-1] == ']'
+        if tracker.is_tracking
           # mark tracker as non-tracking
           tracker.is_tracking = false
           option = option[0..-2]
@@ -163,7 +160,7 @@ module Consoler
         end
       end
 
-      return option, optional
+      [option, optional]
     end
 
     # Check long definition
@@ -171,14 +168,14 @@ module Consoler
     # @param [String] option Option definition
     # @return [(String, Boolean)]
     def _is_long(option)
-      if option[0..1] == '--' then
+      if option[0..1] == '--'
         long = true
         option = option[2..-1]
       else
         long = false
       end
 
-      return option, long
+      [option, long]
     end
 
     # Check short definition
@@ -186,14 +183,14 @@ module Consoler
     # @param [String] option Option definition
     # @return [(String, Boolean)]
     def _is_short(option)
-      if option[0] == '-' then
+      if option[0] == '-'
         short = true
         option = option[1..-1]
       else
         short = false
       end
 
-      return option, short
+      [option, short]
     end
 
     # Check value definition
@@ -202,8 +199,8 @@ module Consoler
     # @raise [RuntimeError] if you try to assign a value to an argument
     # @return [(String, Boolean)]
     def _value(option, argument)
-      if option[-1] == '=' then
-        if argument then
+      if option[-1] == '='
+        if argument
           raise 'Arguments can\'t have a value'
         end
 
@@ -213,7 +210,7 @@ module Consoler
         value = false
       end
 
-      return option, value
+      [option, value]
     end
   end
 end

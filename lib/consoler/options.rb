@@ -3,7 +3,6 @@
 require_relative 'option'
 
 module Consoler
-
   # List of options
   #
   # @attr_reader [String] description Description of the options
@@ -21,7 +20,7 @@ module Consoler
       return if options_def.nil?
 
       # strip the description
-      if match = /(^|\s+)-- (?<description>.*)$/.match(options_def) then
+      if (match = /(^|\s+)-- (?<description>.*)$/.match(options_def))
         @description = match[:description]
         options_def = options_def[0...-match[0].size]
       end
@@ -31,7 +30,7 @@ module Consoler
 
       option_names = []
 
-      while option_def = options.shift do
+      while (option_def = options.shift)
         Consoler::Option.create option_def, tracker do |option|
           raise "Duplicate option name: #{option.name}" if option_names.include? option.name
 
@@ -47,12 +46,12 @@ module Consoler
     # @return [Consoler::Option, nil]
     def get(name)
       each do |option, _|
-        if option.name == name then
+        if option.name == name
           return option
         end
       end
 
-      return nil
+      nil
     end
 
     # Loop through all options
@@ -84,27 +83,23 @@ module Consoler
       each do |option, i|
         definition += ' '
 
-        if optional.nil? and option.is_optional then
+        if optional.nil? && option.is_optional
           definition += '['
           optional = option.is_optional
         end
 
         definition += option.to_definition
 
-        if option.is_optional then
-          # only close when the next option is not optional, or another optional group
-          if @options[i + 1].nil? or optional != @options[i + 1].is_optional then
-            definition += ']'
-            optional = nil
-          end
+        # only close when the next option is not optional, or another optional group
+        if option.is_optional && (@options[i + 1].nil? || optional != @options[i + 1].is_optional)
+          definition += ']'
+          optional = nil
         end
       end
 
       definition.strip
     end
   end
-
-  private
 
   # Optionals tracker
   #

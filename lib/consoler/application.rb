@@ -4,7 +4,6 @@ require_relative 'options'
 require_relative 'arguments'
 
 module Consoler
-
   # Consoler application
   #
   # @example A simple application
@@ -24,14 +23,23 @@ module Consoler
   #   # this does not match, nothing is executed and the usage message is printed
   #   app.run(['deploy', 'production'])
   class Application
-
     # Create a consoler application
     #
     # @param options [Hash] Options for the application
     # @option options [String] :description The description for the application (optional)
-    def initialize(options={})
+    def initialize(options = {})
       @description = options[:description]
       @commands = []
+    end
+
+    # Accept all method_missing call
+    #
+    # We use the name as a command name, thus we accept all names
+    #
+    # @param _name [String] Name of the method
+    # @param _include_private [bool] Name of the method
+    def respond_to_missing?(_method_name, _include_private = false)
+      true
     end
 
     # Register a command for this app
@@ -44,21 +52,21 @@ module Consoler
       action = nil
       options_def = ''
 
-      unless block.nil? then
+      unless block.nil?
         action = block
         options_def = input
 
-        if not options_def.nil? and not options_def.instance_of? String then
+        if !options_def.nil? && !options_def.instance_of?(String)
           raise 'Invalid options'
         end
       end
 
-      if input.instance_of? Consoler::Application then
+      if input.instance_of? Consoler::Application
         action = input
         options_def = ''
       end
 
-      if action.nil? then
+      if action.nil?
         raise 'Invalid subapp/block'
       end
 
@@ -66,7 +74,7 @@ module Consoler
 
       _add_command(command, options_def, action)
 
-      return nil
+      nil
     end
 
     # Run the application with a list of arguments
@@ -75,15 +83,15 @@ module Consoler
     # @param disable_usage_message [Boolean] Disable the usage message when nothing it matched
     # @return [mixed] Result of your matched command, <tt>nil</tt> otherwise
     def run(args = ARGV, disable_usage_message = false)
-      # TODO signal handling of some kind?
+      # TODO: signal handling of some kind?
 
       result, matched = _run(args.dup)
 
-      if not matched and not disable_usage_message
+      if !matched && !disable_usage_message
         usage
       end
 
-      return result
+      result
     end
 
     # Show the usage message
@@ -93,7 +101,7 @@ module Consoler
       puts "#{@description}\n\n" unless @description.nil?
       puts 'Usage:'
 
-      _commands_usage $0
+      _commands_usage $PROGRAM_NAME
     end
 
     protected
@@ -107,13 +115,13 @@ module Consoler
       arguments = Consoler::Arguments.new args
 
       @commands.each do |command|
-        if command.command == arg then
+        if command.command == arg
           # the matched command contains a subapp, run subapp with the same
           # arguments (excluding the arg that matched this command)
-          if command.action.instance_of? Consoler::Application then
+          if command.action.instance_of?(Consoler::Application)
             result, matched = command.action._run(args)
 
-            if matched then
+            if matched
               return result, true
             end
           else
@@ -126,26 +134,26 @@ module Consoler
         end
       end
 
-      return nil, false
+      [nil, false]
     end
 
     # Print the usage message for this command
     #
     # @param [String] prefix A prefix for the command from a parent app
     # @return [Consoler::Application]
-    def _commands_usage(prefix='')
+    def _commands_usage(prefix = '')
       @commands.each do |command|
         # print the usage message of a subapp with a prefix from the current command
-        if command.action.instance_of? Consoler::Application then
+        if command.action.instance_of?(Consoler::Application)
           command.action._commands_usage "#{prefix} #{command.command}"
         else
           print "  #{prefix} #{command.command}"
 
-          if command.options.size then
+          if command.options.size
             print " #{command.options.to_definition}"
           end
 
-          unless command.options.description.nil? then
+          unless command.options.description.nil?
             print "  -- #{command.options.description}"
           end
 
@@ -165,11 +173,13 @@ module Consoler
     # @param [Proc, Consoler::Application] action Action or subapp
     # @return [Consoler::Application]
     def _add_command(command, options_def, action)
-      @commands.push(Consoler::Command.new(
-        command: command,
-        options: Consoler::Options.new(options_def),
-        action: action,
-      ))
+      @commands.push(
+        Consoler::Command.new(
+          command: command,
+          options: Consoler::Options.new(options_def),
+          action: action,
+        )
+      )
 
       self
     end
@@ -183,7 +193,7 @@ module Consoler
       arguments = action.parameters.map do |parameter|
         parameter_name = parameter[1].to_s
 
-        if match.has_key? parameter_name then
+        if match.key? parameter_name
           match[parameter_name]
         else
           # check for the normalized name of every match to see
@@ -191,7 +201,7 @@ module Consoler
           match.each do |name, value|
             normalized_name = _normalize name
 
-            if parameter_name == normalized_name then
+            if parameter_name == normalized_name
               return value
             end
           end
@@ -212,7 +222,7 @@ module Consoler
       # also be an syntax error, like starting with a number.
       # this normalization is more of a comvenience than anything
       # else
-      name.gsub('-', '_')
+      name.tr('-', '_')
     end
   end
 end

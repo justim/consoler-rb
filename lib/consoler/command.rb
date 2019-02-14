@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Consoler
-
   # Consoler command
   #
   # Basically a named hash
