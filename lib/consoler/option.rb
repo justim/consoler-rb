@@ -76,6 +76,10 @@ module Consoler
         definition = "#{definition}="
       end
 
+      if is_argument
+        definition = "<#{definition}>"
+      end
+
       definition
     end
 
@@ -107,6 +111,15 @@ module Consoler
       option, @is_short = _is_short option
       @is_argument = (!@is_long && !@is_short)
       option, @is_value = _value option, @is_argument
+
+      if option[0] == '<'
+        raise 'Invalid <, missing >' if option[-1] != '>'
+        raise 'Only arguments support <, > around name' unless @is_argument
+
+        option = option[1..-2]
+      end
+
+      raise 'Missing starting <' if option[-1] == '>'
 
       @name = option
 

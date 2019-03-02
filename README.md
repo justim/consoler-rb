@@ -9,7 +9,7 @@
 app = Consoler::Application.new description: 'A simple app'
 
 # define a command
-app.build '[--clean] output_dir' do |clean, output_dir|
+app.build '[--clean] <output_dir>' do |clean, output_dir|
   # clean contains a boolean
   clean_up if clean
 
@@ -93,7 +93,7 @@ app.build do
 end
 
 # to add options to your command, provide a options definition as an argument
-app.build '[--clean] [--env=] [-v] output_dir' do |clean, env, v, output_dir|
+app.build '[--clean] [--env=] [-v] <output_dir>' do |clean, env, v, output_dir|
   # parameters are matched based on name
   # `clean` contains a boolean
   # `env` contains a string or nil if not provided
@@ -111,7 +111,7 @@ end
 app = Consoler::Application.new
 
 # a build command
-app.build '[--clean] [--env=] [-v] output_dir' do |clean, env, v, output_dir|
+app.build '[--clean] [--env=] [-v] <output_dir>' do |clean, env, v, output_dir|
   puts 'Starting build...' if v > 0
 
   do_clean_up if clean
@@ -142,24 +142,26 @@ ruby app.rb deploy
 
 #### Options definition
 
-| Option       | Meaning                         | Example                                |
-| ------------ | ------------------------------- | -------------------------------------- |
-| `-f`         | Short option with name `f`      | `ruby app.rb build -f`                 |
-| `--clean`    | Long option with name `clean`   | `ruby app.rb build --clean`            |
-| `output_dir` | Argument with name `output_dir` | `ruby app.rb build dist/`              |
-| `--env=`     | Long option with value          | `ruby app.rb build --env production`   |
-| `-e=`        | Short option with value         | `ruby app.rb build -e production`      |
-| `[ .. ]`     | Optional options/arguments      | `ruby app.rb build` would match `[-v]` |
+| Option         | Meaning                         | Example                                |
+| -------------- | ------------------------------- | -------------------------------------- |
+| `-f`           | Short option with name `f`      | `ruby app.rb build -f`                 |
+| `--clean`      | Long option with name `clean`   | `ruby app.rb build --clean`            |
+| `<output_dir>` | Argument with name `output_dir` | `ruby app.rb build dist/`              |
+| `--env=`       | Long option with value          | `ruby app.rb build --env production`   |
+| `-e=`          | Short option with value         | `ruby app.rb build -e production`      |
+| `[ .. ]`       | Optional options/arguments      | `ruby app.rb build` would match `[-v]` |
 
-Optional-tokens can occur anywhere in the options, as long as they are not nested and properly closed. You can group optional parts, meaning that both options/arguments should be available or both not.
+Some notes about these options:
 
-Options and/or arguments are mandatory unless specified otherwise.
+- The `<`, `>` around the argument name a optional, but are always shown in de usage message for better legibility
+- Optional-tokens can occur anywhere in the options, as long as they are not nested and properly closed. You can group optional parts, meaning that both options/arguments should be available or both not.
+- Options and/or arguments are mandatory unless specified otherwise.
 
 Grouping of optionals allows you do things like this:
 
 ```ruby
 app = Consoler::Application.new
-app.shout '[first_name last_name] [name]' do |first_name, last_name, name|
+app.shout '[<first_name> <last_name>] [<name>]' do |first_name, last_name, name|
   # by definition, `last_name` is also filled
   unless first_name.nil? then
     puts "Hello #{first_name} #{last_name}!"
@@ -245,7 +247,7 @@ app = Consoler::Application.new
 app.db db
 app.cache cache
 
-app.build '[--clean] [--env=] [-v] output_dir -- build the project' do |clean, env, v, output_dir|
+app.build '[--clean] [--env=] [-v] <output_dir> -- build the project' do |clean, env, v, output_dir|
   puts 'Starting build...' if v > 0
 
   if clean

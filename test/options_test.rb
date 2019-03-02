@@ -263,13 +263,43 @@ class OptionsTest < Minitest::Test
   def test_definition_argument
     options = Consoler::Options.new 'name'
 
-    assert_equal 'name', options.to_definition
+    assert_equal '<name>', options.to_definition
+  end
+
+  def test_definition_argument_explicit
+    options = Consoler::Options.new '<name>'
+
+    assert_equal '<name>', options.to_definition
+  end
+
+  def test_definition_argument_broken_explicit
+    err = assert_raises RuntimeError do
+      Consoler::Options.new '<name'
+    end
+
+    assert_equal 'Invalid <, missing >', err.message
+  end
+
+  def test_definition_argument_broken_explicit_second
+    err = assert_raises RuntimeError do
+      Consoler::Options.new 'name>'
+    end
+
+    assert_equal 'Missing starting <', err.message
   end
 
   def test_definition_short
     options = Consoler::Options.new '-n'
 
     assert_equal '-n', options.to_definition
+  end
+
+  def test_definition_short_explicit
+    err = assert_raises RuntimeError do
+      Consoler::Options.new '-<n>'
+    end
+
+    assert_equal 'Only arguments support <, > around name', err.message
   end
 
   def test_definition_short_combined
@@ -307,24 +337,24 @@ class OptionsTest < Minitest::Test
   def test_definition_optional
     options = Consoler::Options.new '[name]'
 
-    assert_equal '[name]', options.to_definition
+    assert_equal '[<name>]', options.to_definition
   end
 
   def test_definition_optional_multi
     options = Consoler::Options.new '[first_name] [last_name]'
 
-    assert_equal '[first_name] [last_name]', options.to_definition
+    assert_equal '[<first_name>] [<last_name>]', options.to_definition
   end
 
   def test_definition_optional_groups
     options = Consoler::Options.new '[first_name last_name]'
 
-    assert_equal '[first_name last_name]', options.to_definition
+    assert_equal '[<first_name> <last_name>]', options.to_definition
   end
 
   def test_definition_mixed
     options = Consoler::Options.new '--force [name] [first_name last_name] -n='
 
-    assert_equal '--force [name] [first_name last_name] -n=', options.to_definition
+    assert_equal '--force [<name>] [<first_name> <last_name>] -n=', options.to_definition
   end
 end
