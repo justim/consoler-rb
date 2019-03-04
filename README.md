@@ -39,6 +39,7 @@ Tests are run against multiple ruby versions (latest supported):
 - `2.3.x`
 - `2.4.x`
 - `2.5.x`
+- `2.6.x`
 
 No other requirements exist.
 
