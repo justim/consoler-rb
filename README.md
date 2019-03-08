@@ -16,10 +16,12 @@ app.build '[--clean] <output_dir>' do |clean, output_dir|
   # output_dir contains a string
   build_project output_dir
 end
-app.run(['build', 'production', '--clean'])
+
+# run with own args
+app.run ['build', 'production', '--clean']
 
 # this does not match, nothing is executed and the usage message is printed
-app.run(['deploy', 'production'])
+app.run ['deploy', 'production']
 
 # defaults to ARGV
 app.run
@@ -65,7 +67,7 @@ end
 
 ## Docs
 
-Full API documentation can the found here: http://www.rubydoc.info/github/justim/consoler-rb/
+Full API documentation can the found here: https://www.rubydoc.info/github/justim/consoler-rb/
 
 ### API
 
@@ -175,11 +177,11 @@ end
 
 # calling with two arguments can fill the first group
 # prints "Hello John Doe!"
-app.run(['shout', 'John', 'Doe'])
+app.run ['shout', 'John', 'Doe']
 
 # calling with one argument it is not possible to fill the first group
 # prints "Hello Mr. White!"
-app.run(['shout', 'Mr. White!'])
+app.run ['shout', 'Mr. White!']
 ```
 
 #### Return types in action block
