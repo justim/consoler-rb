@@ -9,6 +9,7 @@ module Consoler
   # @attr_reader [Boolean] is_argument Is the option an argument
   # @attr_reader [Boolean] is_value Does the option need a value (<tt>--option=</tt>)
   # @attr_reader [Integer] is_optional Is the option optional (> 0) (<tt>[option]</tt>)
+  # @attr_reader [Array] aliases List of aliases of option (<tt>-v|--verbose</tt>)
   class Option
     attr_reader :name
     attr_reader :is_long
@@ -16,6 +17,7 @@ module Consoler
     attr_reader :is_argument
     attr_reader :is_value
     attr_reader :is_optional
+    attr_reader :aliases
 
     # Create a option
     #
@@ -74,10 +76,12 @@ module Consoler
 
       if is_value
         definition = "#{definition}="
+      elsif is_argument
+        definition = "<#{definition}>"
       end
 
-      if is_argument
-        definition = "<#{definition}>"
+      aliases.each do |alias_|
+        definition = "#{definition}|#{alias_.to_definition}"
       end
 
       definition
@@ -106,11 +110,16 @@ module Consoler
       # Check for multiple attributes in the option definition till we got the
       # final name and all of its attributes
 
-      option, @is_optional = _is_optional option_def, tracker
+      # make sure we don't wrongly process any alias
+      alias_defs = option_def.split '|'
+      option = alias_defs.shift || ''
+
+      option, @is_optional = _is_optional option, tracker
       option, @is_long = _is_long option
       option, @is_short = _is_short option
       @is_argument = (!@is_long && !@is_short)
       option, @is_value = _value option, @is_argument
+      option, @aliases = _aliases option, alias_defs, tracker
 
       if option[0] == '<'
         raise 'Invalid <, missing >' if option[-1] != '>'
@@ -224,6 +233,35 @@ module Consoler
       end
 
       [option, value]
+    end
+
+    # Parse all possible aliases
+    #
+    # @param [String] option Option definition
+    # @param [Consoler::Tracker] tracker Optional tracker
+    # @raise [RuntimeError] On all kinds of occasions
+    # @return [(String, Array)] Remaining option definition, and, aliases if available
+    def _aliases(option, alias_defs, tracker)
+      return option, [] if alias_defs.empty?
+
+      raise 'Argument can\'t have aliases' if is_argument
+      raise 'Aliases are not allowed for multiple short options' if is_short && option.size > 1
+
+      aliases_ = []
+      alias_names = []
+
+      while (alias_def = alias_defs.shift)
+        Consoler::Option.create alias_def, tracker do |alias_|
+          raise "Duplicate alias name: #{alias_.name}" if alias_names.include? alias_.name
+          raise "Alias must have a value: #{alias_.name}" if is_value && !alias_.is_value
+          raise "Alias can't have a value: #{alias_.name}" if !is_value && alias_.is_value
+
+          aliases_.push alias_
+          alias_names.push alias_.name
+        end
+      end
+
+      [option, aliases_]
     end
   end
 end

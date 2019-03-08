@@ -49,6 +49,14 @@ module Consoler
 
       if @matched_options.size == @options.size
         @matched_options['remaining'] = remaining
+
+        # make sure all aliases are also filled
+        @options.each do |option|
+          option.aliases.each do |alias_|
+            @matched_options[alias_.name] = @matched_options[option.name]
+          end
+        end
+
         return @matched_options
       end
 
@@ -88,18 +96,15 @@ module Consoler
                         name
                       end
 
-        option = @options.get option_name
+        option, matched = @options.get_with_alias option_name
 
         # no option by this name in options
         return nil if option.nil?
 
-        needs_short = option.is_short
-        needs_long = option.is_long
-
         # see if the type if right, short or long
-        if needs_long && !is_long
+        if matched.is_long && !is_long
           return nil
-        elsif needs_short && !is_short
+        elsif matched.is_short && !is_short
           return nil
         end
 
@@ -108,10 +113,10 @@ module Consoler
             # is_value needs a next argument for its value
             return nil if _peek_next.nil?
 
-            @matched_options[name] = _peek_next
+            @matched_options[option.name] = _peek_next
             _skip_next
           else
-            @matched_options[name] = true
+            option_value! option
           end
         end
 
@@ -120,7 +125,7 @@ module Consoler
             # is_value needs a next argument for its value
             return nil if _peek_next.nil?
 
-            @matched_options[name] = _peek_next
+            @matched_options[option.name] = _peek_next
             _skip_next
           else
             # for every character (short option) increment the option value
@@ -128,17 +133,30 @@ module Consoler
               short_option = @options.get n
               return nil if short_option.nil?
 
-              if @matched_options[n].nil?
-                @matched_options[n] = 0
-              end
-
-              @matched_options[n] += 1
+              option_value! short_option
             end
           end
         end
       end
 
       true
+    end
+
+    # Set the value of an option
+    #
+    # Long or short option needed
+    #
+    # @param [Consoler::Option]
+    def option_value!(option)
+      if option.is_short
+        if @matched_options[option.name].nil?
+          @matched_options[option.name] = 0
+        end
+
+        @matched_options[option.name] += 1
+      else
+        @matched_options[option.name] = true
+      end
     end
 
     # Loop through the arguments

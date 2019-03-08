@@ -34,24 +34,46 @@ module Consoler
         Consoler::Option.create option_def, tracker do |option|
           raise "Duplicate option name: #{option.name}" if option_names.include? option.name
 
-          @options.push option
           option_names.push option.name
+
+          option.aliases.each do |alias_|
+            raise "Duplicate alias name: #{alias_.name}" if option_names.include? alias_.name
+
+            option_names.push alias_.name
+          end
+
+          @options.push option
         end
       end
     end
 
-    # Get a options by its name
+    # Get a option by its name
+    #
+    # May be matched by one of its aliases
     #
     # @param name [String] Name of the option
     # @return [Consoler::Option, nil]
     def get(name)
+      option, = get_with_alias name
+      option
+    end
+
+    # Get a option by its name, with matched alias
+    #
+    # @param name [String] Name of the option
+    # @return [[(Consoler::Option, nil), (Consoler::Option, nil)]]
+    def get_with_alias(name)
       each do |option, _|
         if option.name == name
-          return option
+          return option, option
+        end
+
+        option.aliases.each do |alias_|
+          return option, alias_ if alias_.name == name
         end
       end
 
-      nil
+      [nil, nil]
     end
 
     # Loop through all options

@@ -357,4 +357,86 @@ class OptionsTest < Minitest::Test
 
     assert_equal '--force [<name>] [<first_name> <last_name>] -n=', options.to_definition
   end
+
+  def test_alias
+    options = Consoler::Options.new '-f|--force'
+
+    assert_equal 1, options.size
+
+    option_a, alias_a = options.get_with_alias 'force'
+    check_option option_a, name: 'f', is_short: true
+    check_option alias_a, name: 'force', is_long: true
+  end
+
+  def test_alias_multiple
+    options = Consoler::Options.new '-f|--force|--more-power'
+
+    assert_equal 1, options.size
+
+    option_a, alias_a = options.get_with_alias 'force'
+    check_option option_a, name: 'f', is_short: true
+    check_option alias_a, name: 'force', is_long: true
+
+    option_b, alias_b = options.get_with_alias 'more-power'
+    check_option option_b, name: 'f', is_short: true
+    check_option alias_b, name: 'more-power', is_long: true
+  end
+
+  def test_alias_argument
+    err = assert_raises RuntimeError do
+      Consoler::Options.new 'filename|--file'
+    end
+
+    assert_equal 'Argument can\'t have aliases', err.message
+  end
+
+  def test_alias_is_value
+    err = assert_raises RuntimeError do
+      Consoler::Options.new '-v=|--file'
+    end
+
+    assert_equal 'Alias must have a value: file', err.message
+
+    err = assert_raises RuntimeError do
+      Consoler::Options.new '-v|--file='
+    end
+
+    assert_equal 'Alias can\'t have a value: file', err.message
+  end
+
+  def test_alias_multi_short
+    err = assert_raises RuntimeError do
+      Consoler::Options.new '-vf|--file'
+    end
+
+    assert_equal 'Aliases are not allowed for multiple short options', err.message
+  end
+
+  def test_alias_duplicate
+    err = assert_raises RuntimeError do
+      Consoler::Options.new '-v|-v'
+    end
+
+    assert_equal 'Duplicate alias name: v', err.message
+
+    err = assert_raises RuntimeError do
+      Consoler::Options.new '--verbose -v|--verbose'
+    end
+
+    assert_equal 'Duplicate alias name: verbose', err.message
+  end
+
+  def test_alias_definition
+    options = Consoler::Options.new '-v|--verbose'
+
+    assert_equal '-v|--verbose', options.to_definition
+  end
+
+  def test_alias_options
+    options = Consoler::Options.new '-v|--verbose'
+
+    a, b = options.get_with_alias 'oops'
+    assert_nil a
+    assert_nil b
+  end
 end

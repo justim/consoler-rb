@@ -155,6 +155,36 @@ class ArgumentsTest < Minitest::Test
     assert_equal true, match['dashed-option']
   end
 
+  def test_alias_short
+    match = run_match ['--verbose'], '-v|--verbose'
+
+    assert_equal 1, match['v']
+    assert_equal 1, match['verbose']
+  end
+
+  def test_alias_long
+    match = run_match ['--verbose'], '--verbose|-v'
+
+    assert_equal true, match['v']
+    assert_equal true, match['verbose']
+  end
+
+  def test_alias_mixed
+    match = run_match ['--verbose', '-v'], '-v|--verbose'
+
+    assert_equal 2, match['v']
+    assert_equal 2, match['verbose']
+  end
+
+  def test_alias_multi_short
+    match = run_match ['-vvf'], '-v|--verbose --force|-f'
+
+    assert_equal 2, match['v']
+    assert_equal 2, match['verbose']
+    assert_equal true, match['force']
+    assert_equal true, match['f']
+  end
+
   def test_party_deluxe
 		match = run_match(
       ['-vv', '-v', '--reason', 'no more', 'hello.rb', 'something'],

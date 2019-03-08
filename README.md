@@ -32,6 +32,7 @@ app.run
 - No fiddling with `ARGV` and friends
 - Arguments filled based on their name, for easy access
 - Grouped optionals
+- Easy option aliasing
 
 ## Requirements
 
@@ -96,11 +97,11 @@ app.build do
 end
 
 # to add options to your command, provide a options definition as an argument
-app.build '[--clean] [--env=] [-v] <output_dir>' do |clean, env, v, output_dir|
+app.build '[--clean] [--env=] [-v|--verbose] <output_dir>' do |clean, env, verbose, output_dir|
   # parameters are matched based on name
   # `clean` contains a boolean
   # `env` contains a string or nil if not provided
-  # `v` contains a number, counting the times it occurred in the arguments
+  # `verbose` contains a number, counting the times it occurred in the arguments
   # `output_dir` contains a string, if needed to match this command
 end
 ```
@@ -114,23 +115,23 @@ end
 app = Consoler::Application.new
 
 # a build command
-app.build '[--clean] [--env=] [-v] <output_dir>' do |clean, env, v, output_dir|
-  puts 'Starting build...' if v > 0
+app.build '[--clean] [--env=] [-v|--verbose] <output_dir>' do |clean, env, verbose, output_dir|
+  puts 'Starting build...' if verbose > 0
 
   do_clean_up if clean
 
   do_build env || 'development', output_dir
 
-  puts 'Build complete' if v > 0
+  puts 'Build complete' if verbose > 0
 end
 
 # a deploy command
-app.build '[-v] [--env=]' do |env|
-  puts 'Starting deploy...' if v > 0
+app.build '[-v|--verbose] [--env=]' do |env|
+  puts 'Starting deploy...' if verbose > 0
 
   do_deploy env || 'development'
 
-  puts 'Deploy complete' if v > 0
+  puts 'Deploy complete' if verbose > 0
 end
 ```
 
@@ -140,7 +141,7 @@ _Shell commands:_
 ruby app.rb build --env production dist
 
 # deploy
-ruby app.rb deploy
+ruby app.rb deploy --verbose
 ```
 
 #### Options definition
@@ -149,6 +150,7 @@ ruby app.rb deploy
 | -------------- | ------------------------------- | -------------------------------------- |
 | `-f`           | Short option with name `f`      | `ruby app.rb build -f`                 |
 | `--clean`      | Long option with name `clean`   | `ruby app.rb build --clean`            |
+| `-v|--verbose` | Alias option for `v`            | `ruby app.rb build --verbose`          |
 | `<output_dir>` | Argument with name `output_dir` | `ruby app.rb build dist/`              |
 | `--env=`       | Long option with value          | `ruby app.rb build --env production`   |
 | `-e=`          | Short option with value         | `ruby app.rb build -e production`      |
@@ -159,6 +161,8 @@ Some notes about these options:
 - The `<`, `>` around the argument name a optional, but are always shown in de usage message for better legibility
 - Optional-tokens can occur anywhere in the options, as long as they are not nested and properly closed. You can group optional parts, meaning that both options/arguments should be available or both not.
 - Options and/or arguments are mandatory unless specified otherwise.
+- Aliases should be the same "type", meaning that if the original option expands an value, the alias must do as well
+- Aliases are only allowed for short and long options, with or without value and can be optional, just like regular options
 
 Grouping of optionals allows you do things like this:
 
@@ -193,6 +197,8 @@ app.run ['shout', 'Mr. White!']
 | Value       | `String` (`production`) | `nil`                 |
 | Argument    | `String` (`dist/`)      | `nil`                 |
 
+Aliased keep the properties as the original options; with a definition of `-v|--verbose` and providing `--verbose` as an argument, both `v` and `verbose` contain a number (`1` in this case). Same goes the other way around; with a definition of `--force|-f` and providing `-f` as an argument, both `force` and `f` contain a boolean (`true` in this case).
+
 #### Subapplications
 
 To make application nesting possible you can provide a complete application to a command, instead of an action block.
@@ -205,7 +211,7 @@ android = Consoler::Application.new
 android.build do; end
 
 # options are supported just like regular apps
-android.clean '--force' do; end
+android.clean '--force|-f' do; end
 
 # create an application
 app = Consoler::Application.new
@@ -278,10 +284,6 @@ Make the file executable with `chmod a+x app.rb`, you can now call it with `./ap
 # print the usage message
 ./app.rb
 ```
-
-### Current wish-list
-
-- Aliases, mostly to "document" short options, `-v|--verbose`
 
 ## Final notes
 
