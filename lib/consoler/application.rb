@@ -36,7 +36,7 @@ module Consoler
     #
     # We use the name as a command name, thus we accept all names
     #
-    # @param _name [String] Name of the method
+    # @param _method_name [String] Name of the method
     # @param _include_private [bool] Name of the method
     def respond_to_missing?(_method_name, _include_private = false)
       true

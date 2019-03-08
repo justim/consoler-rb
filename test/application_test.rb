@@ -106,4 +106,9 @@ Usage:
 
     assert_equal true, result
   end
+
+  def test_respond_to_missing
+    app = Consoler::Application.new
+    assert_equal true, app.respond_to?(:hello)
+  end
 end
