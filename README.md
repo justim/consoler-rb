@@ -68,7 +68,7 @@ end
 
 ## Docs
 
-Full API documentation can the found here: https://www.rubydoc.info/github/justim/consoler-rb/
+Full API documentation can the found here: https://www.rubydoc.info/gems/consoler/1.1.0
 
 ### API
 
