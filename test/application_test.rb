@@ -96,6 +96,39 @@ Usage:
     assert_equal true, result
   end
 
+  def test_dashed_option_alias
+    command_ran = false
+
+    app = Consoler::Application.new
+    app.build '--clear-cache|-c' do |clear_cache|
+      command_ran = true
+      clear_cache
+    end
+
+    result = app.run ['build', '--clear-cache']
+
+    assert_equal true, result
+    assert_equal true, command_ran
+  end
+
+  def test_subapp_dashed_alias
+    command_ran = false
+
+    db = Consoler::Application.new
+    db.diff '--clear-cache|-c' do |clear_cache|
+      command_ran = true
+      clear_cache
+    end
+
+    app = Consoler::Application.new
+    app.db db
+
+    result = app.run ['db', 'diff', '--clear-cache']
+
+    assert_equal true, result
+    assert_equal true, command_ran
+  end
+
   def test_respond_to_missing
     app = Consoler::Application.new
     assert_equal true, app.respond_to?(:hello)

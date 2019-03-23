@@ -185,6 +185,13 @@ class ArgumentsTest < Minitest::Test
     assert_equal true, match['f']
   end
 
+  def test_alias_dash
+    match = run_match ['--clear-cache'], '--clear-cache|-c'
+
+    assert_equal true, match['clear-cache']
+    assert_equal true, match['c']
+  end
+
   def test_party_deluxe
 		match = run_match(
       ['-vv', '-v', '--reason', 'no more', 'hello.rb', 'something'],

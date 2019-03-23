@@ -202,7 +202,7 @@ module Consoler
             normalized_name = _normalize name
 
             if parameter_name == normalized_name
-              return value
+              break value
             end
           end
         end

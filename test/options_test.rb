@@ -439,4 +439,12 @@ class OptionsTest < Minitest::Test
     assert_nil a
     assert_nil b
   end
+
+  def test_aliases_dash
+    options = Consoler::Options.new '--clear-cache|-c'
+
+    a, b = options.get_with_alias 'c'
+    check_option a, name: 'clear-cache', is_long: true
+    check_option b, name: 'c', is_short: true
+  end
 end
