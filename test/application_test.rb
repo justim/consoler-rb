@@ -3,15 +3,6 @@
 require_relative 'test_helper'
 require 'consoler'
 
-def with_captured_stdout
-  old_stdout = $stdout
-  $stdout = StringIO.new
-  yield
-  $stdout.string
-ensure
-  $stdout = old_stdout
-end
-
 class ApplicationTest < Minitest::Test
   def test_simple_app
     app = Consoler::Application.new
@@ -51,10 +42,6 @@ class ApplicationTest < Minitest::Test
     app = Consoler::Application.new description: 'Consoler app'
     app.jobs subapp
 
-    result = with_captured_stdout do
-      app.run()
-    end
-
     expected = <<-io
 Consoler app
 
@@ -62,7 +49,9 @@ Usage:
   #{$0} jobs start [--force]  -- start the job
     io
 
-    assert_equal expected, result
+    assert_output expected do
+      app.run
+    end
   end
 
   def test_invalid_options
