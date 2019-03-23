@@ -55,20 +55,20 @@ gem install consoler
 or add to your `Gemfile` for applications
 
 ```ruby
-gem 'consoler', '~> 1.1.0'
+gem 'consoler', '~> 1.2.0'
 ```
 
 or to your `.gemspec` file for gems
 
 ```ruby
 Gem::Specification.new do |spec|
-  spec.add_dependency 'consoler', '~> 1.1.0'
+  spec.add_dependency 'consoler', '~> 1.2.0'
 end
 ```
 
 ## Docs
 
-Full API documentation can the found here: https://www.rubydoc.info/gems/consoler/1.1.0
+Full API documentation can the found here: https://www.rubydoc.info/gems/consoler/1.2.0
 
 ### API
 
