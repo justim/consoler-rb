@@ -133,4 +133,47 @@ Usage:
     app = Consoler::Application.new
     assert_equal true, app.respond_to?(:hello)
   end
+
+  def test_command_shortcut
+    app = Consoler::Application.new
+    app.cache do
+      'cache'
+    end
+
+    result = app.run ['c']
+
+    assert_equal 'cache', result
+  end
+
+  def test_command_shortcut_ambiguity
+    app = Consoler::Application.new
+    app.cache do 'cache'; end
+    app.chase do 'chase'; end
+
+    result = app.run ['c'], true
+
+    assert_nil result
+  end
+
+  def test_command_shortcut_with_priority
+    app = Consoler::Application.new
+    app.cache do 'cache'; end
+    app.c do 'c'; end
+
+    result = app.run ['c']
+
+    assert_equal 'c', result
+  end
+
+  def test_command_shortcut_with_subapp
+    cache = Consoler::Application.new
+    cache.clear do 'clear'; end
+
+    app = Consoler::Application.new
+    app.cache cache
+
+    result = app.run ['c', 'c']
+
+    assert_equal 'clear', result
+  end
 end

@@ -112,10 +112,31 @@ module Consoler
     # @return [(mixed, Boolean)] Result of the command, and, did the args match a command at all
     def _run(args)
       arg = args.shift
+
+      return [nil, false] if arg.nil?
+
       arguments = Consoler::Arguments.new args
+      exact_matches = []
+      partial_matches = []
 
       @commands.each do |command|
         if command.command == arg
+          exact_matches.push command
+        elsif command.command.start_with? arg
+          partial_matches.push command
+        end
+      end
+
+      # we only allow a single partial match to prevent ambiguity
+      partial_match = if partial_matches.size == 1
+                        partial_matches[0]
+                      end
+
+      unless exact_matches.empty? && partial_match.nil?
+        matches = exact_matches
+        matches.push partial_match unless partial_match.nil?
+
+        matches.each do |command|
           # the matched command contains a subapp, run subapp with the same
           # arguments (excluding the arg that matched this command)
           if command.action.instance_of?(Consoler::Application)

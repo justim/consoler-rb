@@ -142,6 +142,12 @@ ruby app.rb build --env production dist
 
 # deploy
 ruby app.rb deploy --verbose
+
+# or, you can use command shortcuts. this works by prefix matching and only if
+# there is one match, exact matches always have priority
+ruby app.rb b --env production dist
+ruby app.rb d --verbose
+
 ```
 
 #### Options definition
