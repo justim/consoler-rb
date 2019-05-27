@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.metadata['yard.run'] = 'yri'
 
   spec.required_ruby_version = '>= 2.2'
-  spec.add_development_dependency 'bundler', '~> 1.15'
+  spec.add_development_dependency 'bundler', '~> 2.0'
   spec.add_development_dependency 'minitest', '~> 5.11.3'
   spec.add_development_dependency 'rake', '~> 12.3.0'
   spec.add_development_dependency 'simplecov', '~> 0.16.1'
