@@ -152,15 +152,15 @@ ruby app.rb d --verbose
 
 #### Options definition
 
-| Option         | Meaning                         | Example                                |
-| -------------- | ------------------------------- | -------------------------------------- |
-| `-f`           | Short option with name `f`      | `ruby app.rb build -f`                 |
-| `--clean`      | Long option with name `clean`   | `ruby app.rb build --clean`            |
-| `-v|--verbose` | Alias option for `v`            | `ruby app.rb build --verbose`          |
-| `<output_dir>` | Argument with name `output_dir` | `ruby app.rb build dist/`              |
-| `--env=`       | Long option with value          | `ruby app.rb build --env production`   |
-| `-e=`          | Short option with value         | `ruby app.rb build -e production`      |
-| `[ .. ]`       | Optional options/arguments      | `ruby app.rb build` would match `[-v]` |
+| Option          | Meaning                         | Example                                |
+| --------------- | ------------------------------- | -------------------------------------- |
+| `-f`            | Short option with name `f`      | `ruby app.rb build -f`                 |
+| `--clean`       | Long option with name `clean`   | `ruby app.rb build --clean`            |
+| `-v\|--verbose` | Alias option for `v`            | `ruby app.rb build --verbose`          |
+| `<output_dir>`  | Argument with name `output_dir` | `ruby app.rb build dist/`              |
+| `--env=`        | Long option with value          | `ruby app.rb build --env production`   |
+| `-e=`           | Short option with value         | `ruby app.rb build -e production`      |
+| `[ .. ]`        | Optional options/arguments      | `ruby app.rb build` would match `[-v]` |
 
 Some notes about these options:
 
