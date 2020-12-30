@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'test_helper'
-require 'consoler'
+require_relative './../lib/consoler'
 
 def check_option(option, desired)
   assert_equal desired[:name], option.name

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'test_helper'
-require 'consoler'
+require_relative './../lib/consoler'
 
 def run_match(args, options_def)
   arguments = Consoler::Arguments.new args
@@ -112,7 +112,7 @@ class ArgumentsTest < Minitest::Test
   end
 
   def test_multi_argument_grouped_optional_3
-		match = run_match(
+    match = run_match(
       ['1', '2', '3', '4'],
       '[first] [second thirth] fourth [fifth] [sixth] seventh',
     )
@@ -193,7 +193,7 @@ class ArgumentsTest < Minitest::Test
   end
 
   def test_party_deluxe
-		match = run_match(
+    match = run_match(
       ['-vv', '-v', '--reason', 'no more', 'hello.rb', 'something'],
       '[-v] [-f] [--lang] [--reason=] [foo bar] filename -- yay!',
     )
