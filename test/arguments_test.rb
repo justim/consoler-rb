@@ -192,6 +192,24 @@ class ArgumentsTest < Minitest::Test
     assert_equal true, match['c']
   end
 
+  def test_missing_short_option
+    match = run_match [], '-v'
+
+    assert_nil match
+  end
+
+  def test_missing_long_option
+    match = run_match [], '--force'
+
+    assert_nil match
+  end
+
+  def test_missing_argument
+    match = run_match [], 'filename'
+
+    assert_nil match
+  end
+
   def test_party_deluxe
     match = run_match(
       ['-vv', '-v', '--reason', 'no more', 'hello.rb', 'something'],

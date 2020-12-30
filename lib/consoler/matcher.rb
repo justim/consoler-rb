@@ -201,11 +201,13 @@ module Consoler
 
     # Match arguments to defined option arguments
     #
-    # @return [Array<String>] The remaining args
+    # @return [Array<String>, nil] The remaining args,
+    #                              or <tt>nil</tt> if there are not enough arguments
     def _match_arguments
       @optionals_before = {}
       @optionals_before_has_remaining = false
 
+      total_argument_values = @argument_values.size
       argument_values_index = 0
 
       _match_arguments_optionals_before
@@ -216,6 +218,8 @@ module Consoler
         optionals.each do |_, optional|
           optional.each do |before|
             if before[:included]
+              return nil if argument_values_index >= total_argument_values
+
               @matched_options[before[:name]] = @argument_values[argument_values_index]
               argument_values_index += 1
             end
@@ -224,6 +228,8 @@ module Consoler
 
         # only fill mandatory argument if its not the :REMAINING key
         if mandatory_arg_name != :REMAINING
+          return nil if argument_values_index >= total_argument_values
+
           @matched_options[mandatory_arg_name] = @argument_values[argument_values_index]
           argument_values_index += 1
         end
