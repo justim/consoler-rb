@@ -27,8 +27,14 @@ module Consoler
     #
     # @param options [Hash] Options for the application
     # @option options [String] :description The description for the application (optional)
+    # @option options [bool] :rescue_errors Should the application catch errors (optional)
     def initialize(options = {})
       @description = options[:description]
+      @rescue_errors = if !options[:rescue_errors].nil? then
+                        options[:rescue_errors]
+                       else
+                         true
+                       end
       @commands = []
     end
 
@@ -92,6 +98,13 @@ module Consoler
       end
 
       result
+    rescue RuntimeError => e
+      if @rescue_errors
+        $stderr.puts "A runtime error occured: #{e.message.strip}"
+        nil
+      else
+        raise e
+      end
     end
 
     # Show the usage message

@@ -176,4 +176,28 @@ Usage:
 
     assert_equal 'clear', result
   end
+
+  def test_raised_error
+    app = Consoler::Application.new
+    app.invalid do raise 'Some error'; end
+
+    expected = <<-io
+A runtime error occured: Some error
+    io
+
+    assert_output nil, expected do
+      app.run ['invalid']
+    end
+  end
+
+  def test_nonrescued_raised_error
+    app = Consoler::Application.new rescue_errors: false
+    app.invalid do raise 'Some error'; end
+
+    err = assert_raises RuntimeError do
+      app.run ['invalid']
+    end
+
+    assert_equal 'Some error', err.message
+  end
 end
