@@ -30,8 +30,8 @@ module Consoler
     # @option options [bool] :rescue_errors Should the application catch errors (optional)
     def initialize(options = {})
       @description = options[:description]
-      @rescue_errors = if !options[:rescue_errors].nil? then
-                        options[:rescue_errors]
+      @rescue_errors = if !options[:rescue_errors].nil?
+                         options[:rescue_errors]
                        else
                          true
                        end
@@ -83,6 +83,9 @@ module Consoler
       nil
     end
 
+    # It would be a breaking change
+    # rubocop:disable Style/OptionalBooleanParameter
+
     # Run the application with a list of arguments
     #
     # @param args [Array] Arguments
@@ -100,12 +103,13 @@ module Consoler
       result
     rescue RuntimeError => e
       if @rescue_errors
-        $stderr.puts "A runtime error occured: #{e.message.strip}"
+        warn "A runtime error occured: #{e.message.strip}"
         nil
       else
         raise e
       end
     end
+    # rubocop:enable Style/OptionalBooleanParameter
 
     # Show the usage message
     #

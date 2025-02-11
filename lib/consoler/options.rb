@@ -20,7 +20,7 @@ module Consoler
       return if options_def.nil?
 
       # strip the description
-      if (match = /(^|\s+)-- (?<description>.*)$/.match(options_def))
+      if (match = /(?<whitespace>^|\s+)-- (?<description>.*)$/.match(options_def))
         @description = match[:description]
         options_def = options_def[0...-match[0].size]
       end
@@ -80,10 +80,8 @@ module Consoler
     #
     # @yield [Consoler::Option, Integer] An option
     # @return [Consoler::Options]
-    def each
-      @options.each_with_index do |option, i|
-        yield option, i
-      end
+    def each(&block)
+      @options.each_with_index(&block)
 
       self
     end

@@ -117,7 +117,7 @@ module Consoler
       option, @is_optional = _is_optional option, tracker
       option, @is_long = _is_long option
       option, @is_short = _is_short option
-      @is_argument = (!@is_long && !@is_short)
+      @is_argument = !@is_long && !@is_short
       option, @is_value = _value option, @is_argument
       option, @aliases = _aliases option, alias_defs, tracker
 

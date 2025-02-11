@@ -215,24 +215,24 @@ module Consoler
       @optionals_before.each do |mandatory_arg_name, optionals|
         # fill the optional argument option with a value if there are enough
         # arguments supplied (info available from optionals map)
-        optionals.each do |_, optional|
+        optionals.each_value do |optional|
           optional.each do |before|
-            if before[:included]
-              return nil if argument_values_index >= total_argument_values
+            next unless before[:included]
 
-              @matched_options[before[:name]] = @argument_values[argument_values_index]
-              argument_values_index += 1
-            end
+            return nil if argument_values_index >= total_argument_values
+
+            @matched_options[before[:name]] = @argument_values[argument_values_index]
+            argument_values_index += 1
           end
         end
 
         # only fill mandatory argument if its not the :REMAINING key
-        if mandatory_arg_name != :REMAINING
-          return nil if argument_values_index >= total_argument_values
+        next if mandatory_arg_name == :REMAINING
 
-          @matched_options[mandatory_arg_name] = @argument_values[argument_values_index]
-          argument_values_index += 1
-        end
+        return nil if argument_values_index >= total_argument_values
+
+        @matched_options[mandatory_arg_name] = @argument_values[argument_values_index]
+        argument_values_index += 1
       end
 
       remaining = []
@@ -253,6 +253,9 @@ module Consoler
       @optionals_before = {}
       tracker = {}
 
+      # `@options` is not a hash
+      # rubocop:disable Style/HashEachMethods
+
       @options.each do |option, _key|
         next unless option.is_argument
 
@@ -270,6 +273,8 @@ module Consoler
           tracker = {}
         end
       end
+
+      # rubocop:enable Style/HashEachMethods
 
       # make sure all optionals are accounted for in the map
       if tracker != {}
@@ -333,7 +338,7 @@ module Consoler
     #
     # @return [Consoler::Matcher]
     def _each_optional_before_sorted
-      @optionals_before.each do |_, optionals|
+      @optionals_before.each_value do |optionals|
         tmp = []
         optionals.each do |optional_index, before|
           tmp.push(

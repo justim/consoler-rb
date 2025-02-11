@@ -1,5 +1,5 @@
 AllCops:
-  TargetRubyVersion: 2.2
+  TargetRubyVersion: 2.4
 
   Exclude:
     - 'test/**/*'
@@ -37,9 +37,13 @@ Style/GuardClause:
 
 # `super` makes no sense in this case
 # `#respond_to_missing?` is implemented
-Style/MethodMissingSuper:
+Lint/MissingSuper:
   Enabled: false
 
 # I like the comma
 Style/TrailingCommaInArguments:
+  Enabled: false
+
+# Grouping `attr_reader` is not VCS friendly
+Style/AccessorGrouping:
   Enabled: false
